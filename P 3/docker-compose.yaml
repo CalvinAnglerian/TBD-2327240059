@@ -1,0 +1,67 @@
+services:
+  minio1:
+    image: quay.io/minio/minio:latest
+    container_name: minio1
+    volumes:
+      - ./minio1:/data
+    ports:
+      - "9000:9000"   # PORT API S3
+      - "9001:9001"   # PORT Web Console 
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: secretsecret
+    command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
+    networks:
+      - docker_network
+
+  minio2:
+    image: quay.io/minio/minio:latest
+    container_name: minio2
+    volumes:
+      - ./minio2:/data
+    ports:
+      - "9002:9001"   # PORT Web Console 
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: secretsecret
+    command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
+    networks:
+      - docker_network
+
+  minio3:
+    image: quay.io/minio/minio:latest
+    container_name: minio3
+    volumes:
+      - ./minio3:/data
+    ports:
+      - "9003:9001"   # PORT Web Console 
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: secretsecret
+    command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
+    networks:
+      - docker_network
+
+  minio4:
+    image: quay.io/minio/minio:latest
+    container_name: minio4
+    volumes:
+      - ./minio4:/data
+    ports:
+      - "9004:9001"   # PORT Web Console 
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: secretsecret
+    command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
+    networks:
+      - docker_network
+
+volumes:
+  minio1-data:
+  minio2-data:
+  minio3-data:
+  minio4-data:
+
+networks:
+  docker_network:
+    driver: bridge
