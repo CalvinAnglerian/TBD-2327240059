@@ -56,6 +56,23 @@ services:
     networks:
       - docker_network
 
+  # TAMBAHAN BUAT LATIHAN PERTEMUAN 4
+  api:
+    build: ./api
+    container_name: data-lake-api
+    ports:
+      - "8000:8000"
+    environment:
+      MINIO_ENDPOINT: minio1:9000
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: secretsecret
+      MINIO_SECURE: "false"
+      MINIO_BUCKET: bronze
+    depends_on:
+      - minio1
+    networks:
+      - docker_network
+
 volumes:
   minio1-data:
   minio2-data:
