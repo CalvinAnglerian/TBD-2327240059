@@ -1,84 +1,370 @@
+# services:
+#   minio1:
+#     # image: quay.io/minio/minio:latest Ini sebelumnya
+#     image: quay.io/minio:RELEASE.2025-09-07T16-13-09Z # Ini kalo yang diatas tidak bisa
+#     container_name: minio1
+#     volumes:
+#       - ./minio1:/data
+#     ports:
+#       - "9000:9000"   # PORT API S3
+#       - "9001:9001"   # PORT Web Console 
+#     environment:
+#       MINIO_ROOT_USER: admin
+#       MINIO_ROOT_PASSWORD: secretsecret
+#     command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
+#     networks:
+#       - docker_network
+
+#   minio2:
+#     # image: quay.io/minio/minio:latest Ini sebelumnya
+#     image: quay.io/minio:RELEASE.2025-09-07T16-13-09Z # Ini kalo yang diatas tidak bisa
+#     container_name: minio2
+#     volumes:
+#       - ./minio2:/data
+#     ports:
+#       - "9002:9001"   # PORT Web Console 
+#     environment:
+#       MINIO_ROOT_USER: admin
+#       MINIO_ROOT_PASSWORD: secretsecret
+#     command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
+#     networks:
+#       - docker_network
+
+#   minio3:
+#     # image: quay.io/minio/minio:latest Ini sebelumnya
+#     image: quay.io/minio:RELEASE.2025-09-07T16-13-09Z # Ini kalo yang diatas tidak bisa
+
+#     container_name: minio3
+#     volumes:
+#       - ./minio3:/data
+#     ports:
+#       - "9003:9001"   # PORT Web Console 
+#     environment:
+#       MINIO_ROOT_USER: admin
+#       MINIO_ROOT_PASSWORD: secretsecret
+#     command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
+#     networks:
+#       - docker_network
+
+#   minio4:
+#     # image: quay.io/minio/minio:latest Ini sebelumnya
+#     image: quay.io/minio:RELEASE.2025-09-07T16-13-09Z # Ini kalo yang diatas tidak bisa
+
+#     container_name: minio4
+#     volumes:
+#       - ./minio4:/data
+#     ports:
+#       - "9004:9001"   # PORT Web Console 
+#     environment:
+#       MINIO_ROOT_USER: admin
+#       MINIO_ROOT_PASSWORD: secretsecret
+#     command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
+#     networks:
+#       - docker_network
+
+#   # TAMBAHAN BUAT LATIHAN PERTEMUAN 4
+#   api:
+#     build: ./api
+#     container_name: data-lake-api
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       MINIO_ENDPOINT: minio1:9000
+#       MINIO_ACCESS_KEY: admin
+#       MINIO_SECRET_KEY: secretsecret
+#       MINIO_SECURE: "false"
+#       MINIO_BUCKET: bronze
+#     depends_on:
+#       - minio1
+#     networks:
+#       - docker_network
+
+#   # # CATATAN SAJA (tidak dipakai di quay.io)
+#   # # PERTEMUAN 5 : tambahkan Container Jupyter 
+#   # jupyter-pandas:
+#   #   image: jupyter/minimal-notebook:latest
+#   #   container_name: jupyter
+#   #   hostname: jupyter
+#   #   ports: 
+#   #     - "8888:8888"
+#   #   volumes:
+#   #     - ./jupyter:/home/joyvan/work
+#   #   environment:
+#   #     - JUPYTER_ENABLE_LAB=yes
+#   #     - JUPYTER_TOKEN=secretsecret
+#   #   networks:
+#   #     - docker_network
+
+# volumes:
+#   minio1-data:
+#   minio2-data:
+#   minio3-data:
+#   minio4-data:
+
+# networks:
+#   docker_network:
+#     driver: bridge
+
+
+# Pakai quay.io atau seaweedfs bisa
+# PAKAI SEAWEEDFS (PERTEMUAN 5)
 services:
-  minio1:
-    image: quay.io/minio/minio:latest
-    container_name: minio1
-    volumes:
-      - ./minio1:/data
-    ports:
-      - "9000:9000"   # PORT API S3
-      - "9001:9001"   # PORT Web Console 
-    environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: secretsecret
-    command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
-    networks:
-      - docker_network
 
-  minio2:
-    image: quay.io/minio/minio:latest
-    container_name: minio2
-    volumes:
-      - ./minio2:/data
-    ports:
-      - "9002:9001"   # PORT Web Console 
-    environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: secretsecret
-    command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
-    networks:
-      - docker_network
+  # ==================================================
+  # SEAWEEDFS MASTER
+  # ==================================================
+  master:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweed-master
+    hostname: master
 
-  minio3:
-    image: quay.io/minio/minio:latest
-    container_name: minio3
-    volumes:
-      - ./minio3:/data
-    ports:
-      - "9003:9001"   # PORT Web Console 
-    environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: secretsecret
-    command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
-    networks:
-      - docker_network
+    command:
+      - master
+      - -ip=master
+      - -ip.bind=0.0.0.0
+      - -mdir=/data
 
-  minio4:
-    image: quay.io/minio/minio:latest
-    container_name: minio4
-    volumes:
-      - ./minio4:/data
     ports:
-      - "9004:9001"   # PORT Web Console 
-    environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: secretsecret
-    command: server http://minio1/data http://minio2/data http://minio3/data http://minio4/data --console-address ":9001"
-    networks:
-      - docker_network
+      - "9333:9333"
 
-  # TAMBAHAN BUAT LATIHAN PERTEMUAN 4
+    volumes:
+      - ./master-data:/data
+
+    networks:
+      - tbd_network
+
+
+  # ==================================================
+  # SEAWEEDFS VOLUME 1
+  # ==================================================
+  volume1:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweed-volume1
+    hostname: volume1
+
+    command:
+      - volume
+      - -ip=volume1
+      - -ip.bind=0.0.0.0
+      - -port=8080
+      - -dir=/data
+      - -master=master:9333
+
+    ports:
+      - "8081:8080"
+
+    volumes:
+      - ./volume1:/data
+
+    depends_on:
+      - master
+
+    networks:
+      - tbd_network
+
+
+  # ==================================================
+  # SEAWEEDFS VOLUME 2
+  # ==================================================
+  volume2:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweed-volume2
+    hostname: volume2
+
+    command:
+      - volume
+      - -ip=volume2
+      - -ip.bind=0.0.0.0
+      - -port=8080
+      - -dir=/data
+      - -master=master:9333
+
+    ports:
+      - "8082:8080"
+
+    volumes:
+      - ./volume2:/data
+
+    depends_on:
+      - master
+
+    networks:
+      - tbd_network
+
+
+  # ==================================================
+  # SEAWEEDFS VOLUME 3
+  # ==================================================
+  volume3:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweed-volume3
+    hostname: volume3
+
+    command:
+      - volume
+      - -ip=volume3
+      - -ip.bind=0.0.0.0
+      - -port=8080
+      - -dir=/data
+      - -master=master:9333
+
+    ports:
+      - "8083:8080"
+
+    volumes:
+      - ./volume3:/data
+
+    depends_on:
+      - master
+
+    networks:
+      - tbd_network
+
+
+  # ==================================================
+  # SEAWEEDFS VOLUME 4
+  # ==================================================
+  volume4:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweed-volume4
+    hostname: volume4
+
+    command:
+      - volume
+      - -ip=volume4
+      - -ip.bind=0.0.0.0
+      - -port=8080
+      - -dir=/data
+      - -master=master:9333
+
+    ports:
+      - "8084:8080"
+
+    volumes:
+      - ./volume4:/data
+
+    depends_on:
+      - master
+
+    networks:
+      - tbd_network
+
+
+  # ==================================================
+  # SEAWEEDFS FILER
+  # ==================================================
+  filer:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweed-filer
+    hostname: filer
+
+    command:
+      - filer
+      - -ip=filer
+      - -ip.bind=0.0.0.0
+      - -master=master:9333
+      - -defaultStoreDir=/data
+
+    ports:
+      - "8888:8888"
+
+    volumes:
+      - ./filer-data:/data
+
+    depends_on:
+      - master
+      - volume1
+      - volume2
+      - volume3
+      - volume4
+
+    networks:
+      - tbd_network
+
+
+  # ==================================================
+  # SEAWEEDFS S3
+  # ==================================================
+  s3:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweed-s3
+    hostname: s3
+
+    command:
+      - s3
+      - -filer=filer:8888
+      - -ip.bind=0.0.0.0
+      - -port=8333
+
+    ports:
+      - "8333:8333"
+
+    depends_on:
+      - filer
+
+    networks:
+      - tbd_network
+
+
+  # ==================================================
+  # API
+  # ==================================================
   api:
-    build: ./api
+    build:
+      context: ./api
+
     container_name: data-lake-api
+
     ports:
       - "8000:8000"
+
     environment:
-      MINIO_ENDPOINT: minio1:9000
+      MINIO_ENDPOINT: s3:8333
       MINIO_ACCESS_KEY: admin
       MINIO_SECRET_KEY: secretsecret
       MINIO_SECURE: "false"
       MINIO_BUCKET: bronze
+
     depends_on:
-      - minio1
+      - s3
+
     networks:
-      - docker_network
+      - tbd_network
 
-volumes:
-  minio1-data:
-  minio2-data:
-  minio3-data:
-  minio4-data:
 
+  # ==================================================
+  # JUPYTER
+  # ==================================================
+  jupyter:
+    image: quay.io/jupyter/minimal-notebook:latest
+
+    container_name: jupyter
+
+    hostname: jupyter
+
+    ports:
+      - "8889:8888"
+
+    volumes:
+      - ./jupyter:/home/jovyan/work
+
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_TOKEN: secretsecret
+
+      MINIO_ENDPOINT: s3:8333
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: secretsecret
+      MINIO_SECURE: "false"
+      MINIO_BUCKET: bronze
+
+    networks:
+      - tbd_network
+
+
+# ==================================================
+# NETWORK
+# ==================================================
 networks:
-  docker_network:
+  tbd_network:
     driver: bridge

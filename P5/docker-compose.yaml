@@ -1,0 +1,14 @@
+  # PERTEMUAN 5 : tambahkan Container Jupyter 
+  jupyter-pandas:
+    image: jupyter/minimal-notebook:latest
+    container_name: jupyter
+    hostname: jupyter
+    ports: 
+      - "8888:8888"
+    volumes:
+      - ./jupyter:/home/joyvan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=secretsecret
+    networks:
+      - docker_network

@@ -1,0 +1,2 @@
+e5b3182e
+{"lastIndex":4,"lastTerm":0,"peers":[{"name":"master:9333.19333","connectionString":"master:19333"}],"state":"eyJtYXhWb2x1bWVJZCI6MCwidG9wb2xvZ3lJZCI6IjhiYmQwMTVkLTc1ZjUtNDE1ZS1hZWFjLTEzYmVhNDUwYjdjNCJ9","path":"/data/m9333/snapshot/0_4.ss"}
