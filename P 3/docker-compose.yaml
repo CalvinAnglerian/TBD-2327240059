@@ -125,10 +125,17 @@ services:
       - -mdir=/data
 
     ports:
-      - "9333:9333"
+      - "8333:8333" # API
+      - "9333:9333" # UI Cluster
+      - "7777:8888" # UI Filler
 
     volumes:
       - ./master-data:/data
+    
+    environment:
+      - endpoint_url="http://localhost:8888",
+      - aws_access_key_id='admin',
+      - aws_secret_access_key='secretsecret',
 
     networks:
       - tbd_network
