@@ -1,14 +1,43 @@
-  # PERTEMUAN 5 : tambahkan Container Jupyter 
-  jupyter-pandas:
-    image: jupyter/minimal-notebook:latest
+# Latihan (PERTEMUAN 5) : 
+
+# Pakai quay.io atau seaweedfs bisa 
+# PAKAI SEAWEEDFS (PERTEMUAN 5-6)
+services:
+  seaweedfs:
+    image: chrislusf/seaweedfs
+    container_name: seaweedfs
+    ports:
+      - "8333:8333" # API
+      - "9333:9333" # UI Cluster
+      - "7777:8888" # UI Filler
+    volumes:
+      - seaweedfs:/data
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=secret
+    command: server -dir=/data -s3 -filer -volume.max=100
+    networks:
+      - tbd_network
+
+  jupyter:
+    image: quay.io/jupyter/minimal-notebook:latest
     container_name: jupyter
     hostname: jupyter
-    ports: 
+    ports:
       - "8888:8888"
-    volumes:
-      - ./jupyter:/home/joyvan/work
     environment:
       - JUPYTER_ENABLE_LAB=yes
       - JUPYTER_TOKEN=secretsecret
+    volumes:
+      - ./jupyter:/home/jovyan/work
     networks:
-      - docker_network
+      - tbd_network
+ 
+volumes:
+  seaweedfs:
+
+networks:
+  tbd_network:
+    driver: bridge
+
+
