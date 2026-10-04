@@ -40,5 +40,3 @@ networks:
   tbd_network:
     driver: bridge
 
-
-# ssasiahsi
