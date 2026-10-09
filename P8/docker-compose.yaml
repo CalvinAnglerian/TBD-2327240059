@@ -1,0 +1,18 @@
+services:
+  jupyter:
+    image: quay.io/jupyter/minimal-notebook:latest
+    container_name: jupyter
+    hostname: jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=secretsecret
+    volumes:
+      - ./jupyter:/home/jovyan/work
+    networks:
+      - docker_network
+
+networks:
+  docker_network:
+    driver: bridge
