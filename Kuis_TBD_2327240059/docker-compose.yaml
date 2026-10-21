@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: hospital_postgres
+    environment:
+      POSTGRES_DB: hospital_db
+      POSTGRES_USER: hospital
+      POSTGRES_PASSWORD: hospital123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hospital -d hospital_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:latest
+    container_name: hospital_seaweedfs
+    command: server -s3 -dir=/data -s3.config=/etc/seaweedfs/s3.json
+    ports:
+      - "8333:8333"
+      - "8888:8888"
+      - "9333:9333"
+    volumes:
+      - seaweed_data:/data
+      - ./s3.json:/etc/seaweedfs/s3.json:ro
+
+  app:
+    build: .
+    container_name: hospital_app
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    environment:
+      DB_HOST: postgres
+      DB_NAME: hospital_db
+      DB_USER: hospital
+      DB_PASSWORD: hospital123
+      S3_ENDPOINT: http://seaweedfs:8333
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seaweedfs:
+        condition: service_started
+    command: ["tail", "-f", "/dev/null"]
+
+volumes:
+  postgres_data:
+  seaweed_data:
