@@ -1,0 +1,9 @@
+merchant_id,merchant_name,category,city,is_blacklisted
+MERCH-101,Toko Elektronik Jaya,Electronics,Jakarta,false
+MERCH-102,Global Digital Goods,Digital,Offshore,true
+MERCH-103,Supermarket Segar,Groceries,Bandung,false
+MERCH-104,Crypto P2P Exchange,Financial,Offshore,true
+MERCH-105,Fashion Store Official,Fashion,Surabaya,false
+MERCH-106,Kedai Kopi Senja,F&B,Yogyakarta,false
+MERCH-107,DarkWeb Asset Market,Digital,Offshore,true
+MERCH-108,Gadget Murah Store,Electronics,Batam,false
