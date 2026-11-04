@@ -1,0 +1,97 @@
+
+services:
+  seaweedfs:
+    image: chrislusf/seaweedfs:latest
+    container_name: smartphone_seaweedfs
+    command: >
+      server
+      -s3
+      -dir=/data
+      -s3.config=/etc/seaweedfs/s3.json
+    ports:
+      - "8333:8333"
+      - "9333:9333"
+      - "8889:8888"
+    volumes:
+      - seaweedfs_data:/data
+      - ./s3.json:/etc/seaweedfs/s3.json:ro
+    restart: unless-stopped
+
+  cassandra1:
+    image: cassandra:4.1
+    container_name: cassandra1
+    hostname: cassandra1
+    environment:
+      CASSANDRA_CLUSTER_NAME: SmartphoneCluster
+      CASSANDRA_DC: DC1
+      CASSANDRA_RACK: RACK1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_SEEDS: cassandra1
+      MAX_HEAP_SIZE: 1G
+      HEAP_NEWSIZE: 256M
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra1_data:/var/lib/cassandra
+    restart: unless-stopped
+
+  cassandra2:
+    image: cassandra:4.1
+    container_name: cassandra2
+    hostname: cassandra2
+    environment:
+      CASSANDRA_CLUSTER_NAME: SmartphoneCluster
+      CASSANDRA_DC: DC1
+      CASSANDRA_RACK: RACK2
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_SEEDS: cassandra1
+      CASSANDRA_LISTEN_ADDRESS: cassandra2
+      CASSANDRA_BROADCAST_ADDRESS: cassandra2
+      MAX_HEAP_SIZE: 1G
+      HEAP_NEWSIZE: 256M
+    depends_on:
+      - cassandra1
+    volumes:
+      - cassandra2_data:/var/lib/cassandra
+    restart: unless-stopped
+
+  cassandra3:
+    image: cassandra:4.1
+    container_name: cassandra3
+    hostname: cassandra3
+    environment:
+      CASSANDRA_CLUSTER_NAME: SmartphoneCluster
+      CASSANDRA_DC: DC1
+      CASSANDRA_RACK: RACK3
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_SEEDS: cassandra1
+      CASSANDRA_LISTEN_ADDRESS: cassandra3
+      CASSANDRA_BROADCAST_ADDRESS: cassandra3
+      MAX_HEAP_SIZE: 1G
+      HEAP_NEWSIZE: 256M
+    depends_on:
+      - cassandra1
+    volumes:
+      - cassandra3_data:/var/lib/cassandra
+    restart: unless-stopped
+
+  python:
+    build: ./app
+    container_name: smartphone_python
+    working_dir: /app
+    command: tail -f /dev/null
+    volumes:
+      - ./app:/app
+      - ./data:/app/data:ro
+    depends_on:
+      - seaweedfs
+      - cassandra1
+      - cassandra2
+      - cassandra3
+    restart: unless-stopped
+
+volumes:
+  seaweedfs_data:
+  cassandra1_data:
+  cassandra2_data:
+  cassandra3_data:
