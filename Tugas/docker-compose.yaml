@@ -1,0 +1,14 @@
+services:
+  python:
+    build: ./python
+    container_name: python
+    volumes:
+      - ./python:/app
+    stdin_open: true # Tambahkan ini
+    tty: true
+    networks:
+      - docker_network
+
+networks:
+  docker_network:
+    driver: bridge
