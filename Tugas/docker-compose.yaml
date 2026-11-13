@@ -1,14 +1,47 @@
 services:
+  seaweedfs_volume:
+    image: chrislusf/seaweedfs:latest
+    container_name: weed_volume_pc2
+    restart: unless-stopped
+    user: "0:0"
+
+    ports:
+      - "8082:8082"
+      - "18082:18082"
+
+    command: >
+      volume
+      -mserver=192.168.5.28:9333
+      -ip=192.168.5.26
+      -ip.bind=0.0.0.0
+      -port=8082
+      -port.grpc=18082
+      -dir=/data/volume
+      -max=100
+
+    volumes:
+      - ./data/volume:/data/volume
+
+
+  # =====================================
+  # PYTHON PC 2
+  # =====================================
+
   python:
     build: ./python
-    container_name: python
+    container_name: python_silver_pc2
+    restart: unless-stopped
+
     volumes:
       - ./python:/app
-    stdin_open: true # Tambahkan ini
-    tty: true
-    networks:
-      - docker_network
 
-networks:
-  docker_network:
-    driver: bridge
+    working_dir: /app
+
+    environment:
+      S3_HOST: 192.168.5.28
+      S3_PORT: 8333
+
+    tty: true
+
+    depends_on:
+      - seaweedfs_volume
